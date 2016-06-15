@@ -16,6 +16,7 @@ applications:
   path: target/metrics-0.0.1-SNAPSHOT.jar
   buildpack: java_buildpack_offline
   env:
+    SPRING_PROFILES_ACTIVE: 'jmx'
     JBP_CONFIG_CONTAINER_CERTIFICATE_TRUST_STORE: '{enabled: true}'
     jmx.host: <jmx-endpoint>
     jmx.port: <jmx-port>
@@ -35,7 +36,10 @@ applications:
 
 **NOTE: If you don't want emails, then you can skip the mail properties**
 
-**NOTE: Without the jmx and cf properties, the application will fail to start**
+**NOTE: With SPRING_PROFILES_ACTIVE=jmx, and without specifying the jmx properties, the application will fail to start**
+
+**NOTE: Without specifying the cf properties, the application will fail to start**
+
 
 - Compile the code using `mvn clean install`
 - Target to the dedicated org/space for these utils

@@ -12,6 +12,7 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -22,6 +23,7 @@ import io.pivotal.domain.JobDetail;
 import io.pivotal.domain.Metrics;
 import io.pivotal.domain.VMMetric;
 
+@Profile("jmx")
 @Service
 public class MetricService {
 	@Autowired

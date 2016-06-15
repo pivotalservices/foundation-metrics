@@ -3,15 +3,21 @@ package io.pivotal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.cloudfoundry.client.lib.CloudCredentials;
 import org.cloudfoundry.client.lib.CloudFoundryClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -21,11 +27,13 @@ public class SpringConfiguration {
 
 	private static final String JMX_URL = "service:jmx:rmi://%s:%s/jndi/rmi://%s:%s/jmxrmi";
 
+	@Profile("jmx")
 	@Bean
 	public MBeanServerConnectionFactoryBean connection(@Value("${jmx.host}") String host,
 			@Value("${jmx.port}") String port, @Value("${jmx.username}") String username,
 			@Value("${jmx.password}") String password) {
 
+		skipSSL();
 		MBeanServerConnectionFactoryBean factoryBean = new MBeanServerConnectionFactoryBean();
 		port = port != null ? port : "44444";
 		System.out.println("PORT IS " + port);
@@ -42,6 +50,30 @@ public class SpringConfiguration {
 		}
 
 		return factoryBean;
+	}
+
+	private void skipSSL() {
+		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+
+			public void checkClientTrusted(X509Certificate[] certs, String authType) {
+			}
+
+			public void checkServerTrusted(X509Certificate[] certs, String authType) {
+			}
+		} };
+
+		try {
+			System.out.println("Hacking SSL Validation");
+			SSLContext sc = SSLContext.getInstance("SSL");
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			SSLContext.setDefault(sc);
+			System.out.println("SSL Validation hacked");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Bean

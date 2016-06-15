@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ import io.pivotal.domain.VMMetric;
 import io.pivotal.service.EmailService;
 import io.pivotal.service.MetricService;
 
+@Profile("jmx")
 @Service
 public class Scheduler {
 
